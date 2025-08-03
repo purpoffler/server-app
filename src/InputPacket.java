@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
 
-public class InputPacket implements Runnable{
+public class InputPacket implements Runnable {
 
     private final BlockingQueue<String> inputQueue;
 
@@ -11,8 +11,10 @@ public class InputPacket implements Runnable{
 
     @Override
     public void run() {
-        Thread server = new Thread(new Server());
+        Thread server = new Thread(new Server(inputQueue));
         server.start();
     }
+
+
 
 }

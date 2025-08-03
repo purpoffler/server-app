@@ -10,13 +10,11 @@ public class Main {
 
         // Создаем потоки и передаем в них очереди, с которыми они должны работать
         Thread inputThread = new Thread(new InputPacket(inputQueue));
-
-//     Thread checkThread = new Thread(new Packaging(inputQueue, processingQueue));
-//     Thread processThread = new Thread(new Client(processingQueue));
+        Thread checkThread = new Thread(new CheckPacket(inputQueue, processingQueue));
+//      Thread processThread = new Thread(new Client(processingQueue));
 
         inputThread.start();
-
-//    checkThread.start();
+        checkThread.start();
 //    processThread.start();
     }
 }
