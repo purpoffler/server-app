@@ -7,9 +7,11 @@ import java.util.concurrent.BlockingQueue;
 
 public class ServerLevel implements Runnable {
     private final BlockingQueue<String> inputQueue;
+    private final BlockingQueue<String> resultValidateQueue;
 
-    public ServerLevel(BlockingQueue<String> inputQueue) {
+    public ServerLevel(BlockingQueue<String> inputQueue, BlockingQueue<String> resultValidateQueue) {
         this.inputQueue = inputQueue;
+        this.resultValidateQueue = resultValidateQueue;
     }
 
     public void run() {
@@ -25,6 +27,8 @@ public class ServerLevel implements Runnable {
                 } else {
                     connection.send("Лел, а данных-то я не получил!");
                 }
+                String resultValidatePacket = resultValidateQueue.take();
+                connection.send(resultValidatePacket);
             }
         } catch (InterruptedException e) {
             ConsoleHelper.writeSystemMessage("Ошибка в считывании пакета");

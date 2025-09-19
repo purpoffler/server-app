@@ -8,11 +8,13 @@ public class Main {
     public static void main(String[] args) {
         // Очереди для связи между потоками
         BlockingQueue<String> inputQueue = new LinkedBlockingQueue<>();
+        BlockingQueue<String> resultValidateQueue = new LinkedBlockingQueue<>();
         BlockingQueue<String> processingQueue = new LinkedBlockingQueue<>();
 
+
         // Создаем потоки и передаем в них очереди, с которыми они должны работать
-        Thread inputThread = new Thread(new ServerLevel(inputQueue));
-        Thread checkThread = new Thread(new CheckPacket(inputQueue, processingQueue));
+        Thread inputThread = new Thread(new ServerLevel(inputQueue, resultValidateQueue));
+        Thread checkThread = new Thread(new CheckPacket(inputQueue, resultValidateQueue, processingQueue));
 //      Thread processThread = new Thread(new Client(processingQueue));
 
         inputThread.start();

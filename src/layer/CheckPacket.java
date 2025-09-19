@@ -9,12 +9,14 @@ import java.util.concurrent.BlockingQueue;
 import java.util.zip.CRC32;
 
 public class CheckPacket implements Runnable {
-    BlockingQueue<String> inputQueue;
-    BlockingQueue<String> processingQueue;
+    private final BlockingQueue<String> inputQueue;
+    private final BlockingQueue<String> processingQueue;
+    private final BlockingQueue<String> resultValidateQueue;
 
-    public CheckPacket(BlockingQueue<String> inputQueue, BlockingQueue<String> processingQueue) {
+    public CheckPacket(BlockingQueue<String> inputQueue, BlockingQueue<String> processingQueue, BlockingQueue<String> resultValidateQueue) {
         this.inputQueue = inputQueue;
         this.processingQueue = processingQueue;
+        this.resultValidateQueue = resultValidateQueue;
     }
 
     @Override
@@ -28,10 +30,10 @@ public class CheckPacket implements Runnable {
                 String data = packet.substring(18, packet.length() - 9);
                 String clientCRC32 = packet.substring(packet.length() - 9, packet.length() - 1);
                 if (checkCRC32(data, clientCRC32)) {
-                    sendMessage("Пакет в норме)");
+                    resultValidateQueue.put("Пакет в норме)");
                     ConsoleHelper.writeSystemMessage(String.format("%s|%s|%s|%s|%s|%n", signature, dataLength, dataType, data, clientCRC32));
                 } else {
-                    sendMessage("Пакет поломался :(");
+                    resultValidateQueue.put("Пакет поломался(");
                 }
             }
         } catch (InterruptedException e) {
@@ -48,13 +50,9 @@ public class CheckPacket implements Runnable {
         return serverCRC32.equals(clientCRC32);
     }
 
-    private void sendMessage(String message) {
-        try {
-            ServerLevel.out.write(message + "\n");
-            ServerLevel.out.flush();
-        } catch (IOException e) {
-            throw new RuntimeException("Ошибка при отправке ответа клиенту", e);
-        }
-    }
+//    private void sendMessage(String message) {
+//            ServerLevel.out.write(message + "\n");
+//            ServerLevel.out.flush();
+//    }
 
 }
