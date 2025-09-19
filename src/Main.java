@@ -1,5 +1,5 @@
-import IngestionLevel.Server;
-import ValidationLevel.CheckPacket;
+import layer.CheckPacket;
+import layer.ServerLevel;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -11,7 +11,7 @@ public class Main {
         BlockingQueue<String> processingQueue = new LinkedBlockingQueue<>();
 
         // Создаем потоки и передаем в них очереди, с которыми они должны работать
-        Thread inputThread = new Thread(new Server(inputQueue));
+        Thread inputThread = new Thread(new ServerLevel(inputQueue));
         Thread checkThread = new Thread(new CheckPacket(inputQueue, processingQueue));
 //      Thread processThread = new Thread(new Client(processingQueue));
 

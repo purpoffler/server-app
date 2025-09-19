@@ -1,13 +1,14 @@
-package ValidationLevel;
+package layer;
 
-import IngestionLevel.Server;
+import layer.enums.ExpectedDataType;
+import utlis.ConsoleHelper;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
+import java.util.zip.CRC32;
 
 public class CheckPacket implements Runnable {
-
     BlockingQueue<String> inputQueue;
     BlockingQueue<String> processingQueue;
 
@@ -25,33 +26,32 @@ public class CheckPacket implements Runnable {
                 String dataLength = packet.substring(8, 11);
                 String dataType = packet.substring(11, 18);
                 String data = packet.substring(18, packet.length() - 9);
-                String CRC32 = packet.substring(packet.length() - 9, packet.length() - 1);
-
-                if (checkType(dataType)) {
+                String clientCRC32 = packet.substring(packet.length() - 9, packet.length() - 1);
+                if (checkCRC32(data, clientCRC32)) {
                     sendMessage("Пакет в норме)");
+                    ConsoleHelper.writeSystemMessage(String.format("%s|%s|%s|%s|%s|%n", signature, dataLength, dataType, data, clientCRC32));
                 } else {
                     sendMessage("Пакет поломался :(");
                 }
-
-                System.out.printf("%s|%s|%s|%s|%s|%n", signature, dataLength, dataType, data, CRC32);
             }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
 
-    // Тип данных - 7 символов
-    private boolean checkType(String dataType) {
-        if (Arrays.stream(ExpectedDataType.values()).anyMatch(x -> x.name().equalsIgnoreCase(dataType))) {
-            return true;
-        }
-        return false;
+    // Проверка контрольной суммы
+    public boolean checkCRC32(String data, String clientCRC32) {
+        CRC32 crc32 = new CRC32();
+        crc32.update(data.getBytes());
+        long value = crc32.getValue();
+        String serverCRC32 = String.valueOf(value);
+        return serverCRC32.equals(clientCRC32);
     }
 
     private void sendMessage(String message) {
         try {
-            Server.out.write(message + "\n");
-            Server.out.flush();
+            ServerLevel.out.write(message + "\n");
+            ServerLevel.out.flush();
         } catch (IOException e) {
             throw new RuntimeException("Ошибка при отправке ответа клиенту", e);
         }

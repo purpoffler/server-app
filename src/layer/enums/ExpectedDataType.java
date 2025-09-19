@@ -1,4 +1,4 @@
-package ValidationLevel;
+package layer.enums;
 
 public enum ExpectedDataType {
     CONSOLE,
