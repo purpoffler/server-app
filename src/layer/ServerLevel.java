@@ -19,16 +19,19 @@ public class ServerLevel implements Runnable {
             ConsoleHelper.writeSystemMessage("Клиент подключился");
             while (true) {
                 String word = connection.receive(); // ждём пока клиент что-нибудь нам напишет
-                ConsoleHelper.writeSystemMessage(word);
+                //ConsoleHelper.writeSystemMessage(word);
                 if (!word.isEmpty()) {
                     connection.send("Привет, это Сервер! Подтверждаю, вы написали : " + word + "\n");
                     inputQueue.put(word);
-                    //System.out.println(inputQueue);
+                    //ConsoleHelper.writeMessage("Какой пакет получили"  + word);
+                    String resultValidatePacket = resultValidateQueue.poll();
+                    ConsoleHelper.writeSystemMessage("То что забралось из очереди " + resultValidatePacket);
+                    if (resultValidatePacket != null) {
+                        connection.send(resultValidatePacket);
+                    }
                 } else {
                     connection.send("Лел, а данных-то я не получил!");
                 }
-                String resultValidatePacket = resultValidateQueue.take();
-                connection.send(resultValidatePacket);
             }
         } catch (InterruptedException e) {
             ConsoleHelper.writeSystemMessage("Ошибка в считывании пакета");

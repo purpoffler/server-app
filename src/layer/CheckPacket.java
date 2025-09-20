@@ -24,16 +24,25 @@ public class CheckPacket implements Runnable {
         try {
             while (true) { // цикл обработки пакетов
                 String packet = inputQueue.take();
-                String signature = packet.substring(0, 8);
-                String dataLength = packet.substring(8, 11);
-                String dataType = packet.substring(11, 18);
-                String data = packet.substring(18, packet.length() - 9);
-                String clientCRC32 = packet.substring(packet.length() - 9, packet.length() - 1);
+                //ConsoleHelper.writeMessage(packet);
+                String[] packetBlocks = packet.split("\\|");
+                ConsoleHelper.writeMessage(Arrays.toString(packetBlocks));
+
+                String signature = packetBlocks[0];
+                String dataLength = packetBlocks[1];
+                String dataType = packetBlocks[2];
+                String data = packetBlocks[3];
+                String clientCRC32 = packetBlocks[4];
+
+                ConsoleHelper.writeSystemMessage(String.valueOf(checkCRC32(data, clientCRC32)));
+                ConsoleHelper.writeSystemMessage(clientCRC32);
                 if (checkCRC32(data, clientCRC32)) {
-                    resultValidateQueue.put("Пакет в норме)");
+                    ConsoleHelper.writeMessage("Проверка пакета " + String.valueOf(checkCRC32(data, clientCRC32)));
+                    resultValidateQueue.offer("Пакет в норме)");
                     ConsoleHelper.writeSystemMessage(String.format("%s|%s|%s|%s|%s|%n", signature, dataLength, dataType, data, clientCRC32));
                 } else {
-                    resultValidateQueue.put("Пакет поломался(");
+                    ConsoleHelper.writeSystemMessage("Я говорю, что поломалси");
+                    resultValidateQueue.offer(new String("Пакет поломался("));
                 }
             }
         } catch (InterruptedException e) {
@@ -49,10 +58,4 @@ public class CheckPacket implements Runnable {
         String serverCRC32 = String.valueOf(value);
         return serverCRC32.equals(clientCRC32);
     }
-
-//    private void sendMessage(String message) {
-//            ServerLevel.out.write(message + "\n");
-//            ServerLevel.out.flush();
-//    }
-
 }
