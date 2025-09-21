@@ -21,6 +21,6 @@ public class Main {
 
         inputThread.start();
         checkThread.start();
-//    processThread.start();
+        processThread.start();
     }
 }

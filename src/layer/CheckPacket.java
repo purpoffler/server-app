@@ -30,6 +30,7 @@ public class CheckPacket implements Runnable {
                     if (resultValidateQueue.offer("Пакет в норме")) {
                         ConsoleHelper.writeSystemMessage("Я положил в очередь положительный ответ проверки пакета");
                         processingQueue.put(userPackage);
+                        ConsoleHelper.writeSystemMessage("Положил в processingQueue");
                     } else {
                         ConsoleHelper.writeSystemMessage("Очередь полна, объект не добавился");
                     }

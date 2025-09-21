@@ -1,15 +1,17 @@
 package dto;
 
+import layer.enums.ExpectedDataType;
+
 public class UserPackage {
     private final String signature;
     private final String dataLength;
-    private final String dataType;
+    private final ExpectedDataType dataType;
     private final String data;
     private final String clientCRC32;
     private final String ip;
     private final String date;
 
-    public UserPackage(String signature, String dataLength, String dataType, String data, String clientCRC32, String ip, String date) {
+    public UserPackage(String signature, String dataLength, ExpectedDataType dataType, String data, String clientCRC32, String ip, String date) {
         this.signature = signature;
         this.dataLength = dataLength;
         this.dataType = dataType;
@@ -27,7 +29,7 @@ public class UserPackage {
         return dataLength;
     }
 
-    public String getDataType() {
+    public ExpectedDataType getDataType() {
         return dataType;
     }
 
