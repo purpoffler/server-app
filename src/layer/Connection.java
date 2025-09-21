@@ -26,6 +26,10 @@ public class Connection implements Closeable {
         return in.readLine();
     }
 
+    public String getIp(){
+        return clientSocket.getInetAddress().getHostAddress();
+    }
+
     @Override
     public void close() throws IOException {
         in.close();

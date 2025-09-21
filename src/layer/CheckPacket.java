@@ -1,19 +1,17 @@
 package layer;
 
-import layer.enums.ExpectedDataType;
+import dto.UserPackage;
 import utlis.ConsoleHelper;
 
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
 import java.util.zip.CRC32;
 
 public class CheckPacket implements Runnable {
-    private final BlockingQueue<String> inputQueue;
-    private final BlockingQueue<String> processingQueue;
+    private final BlockingQueue<UserPackage> inputQueue;
+    private final BlockingQueue<UserPackage> processingQueue;
     private final BlockingQueue<String> resultValidateQueue;
 
-    public CheckPacket(BlockingQueue<String> inputQueue, BlockingQueue<String> resultValidateQueue, BlockingQueue<String> processingQueue) {
+    public CheckPacket(BlockingQueue<UserPackage> inputQueue, BlockingQueue<String> resultValidateQueue, BlockingQueue<UserPackage> processingQueue) {
         this.inputQueue = inputQueue;
         this.processingQueue = processingQueue;
         this.resultValidateQueue = resultValidateQueue;
@@ -23,26 +21,25 @@ public class CheckPacket implements Runnable {
     public void run() {
         try {
             while (true) { // цикл обработки пакетов
-                String packet = inputQueue.take();
-                //ConsoleHelper.writeMessage(packet);
-                String[] packetBlocks = packet.split("\\|");
-                //ConsoleHelper.writeMessage(Arrays.toString(packetBlocks));
-                String signature = packetBlocks[0];
-                String dataLength = packetBlocks[1];
-                String dataType = packetBlocks[2];
-                String data = packetBlocks[3];
-                String clientCRC32 = packetBlocks[4];
+                UserPackage userPackage = inputQueue.take();
+                String data = userPackage.getData();
+                String clientCRC32 = userPackage.getClientCRC32();
                 //ConsoleHelper.writeSystemMessage(String.valueOf(checkCRC32(data, clientCRC32)));
                 if (checkCRC32(data, clientCRC32)) {
                     ConsoleHelper.writeMessage("Проверка пакета " + String.valueOf(checkCRC32(data, clientCRC32)));
-                    if (resultValidateQueue.offer(new String("Пакет в норме"))) {
-                        ConsoleHelper.writeSystemMessage("Я что-то положил в очередь");
+                    if (resultValidateQueue.offer("Пакет в норме")) {
+                        ConsoleHelper.writeSystemMessage("Я положил в очередь положительный ответ проверки пакета");
+                        processingQueue.put(userPackage);
                     } else {
                         ConsoleHelper.writeSystemMessage("Очередь полна, объект не добавился");
                     }
                 } else {
-                    ConsoleHelper.writeSystemMessage("Я говорю, что пакет поломался");
-                    resultValidateQueue.offer(new String("Пакет поломался"));
+                    //ConsoleHelper.writeSystemMessage("Я говорю, что пакет поломался");
+                    if (resultValidateQueue.offer("Пакет поломался")) {
+                        ConsoleHelper.writeSystemMessage("Я положил в очередь отрицательный ответ проверки пакета");
+                    } else {
+                        ConsoleHelper.writeSystemMessage("Очередь полна, объект не добавился");
+                    }
                 }
             }
         } catch (InterruptedException e) {
