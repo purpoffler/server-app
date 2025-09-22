@@ -24,12 +24,11 @@ public class ServerLevel implements Runnable {
             while (true) {
                 String word = connection.receive(); // ждём пока клиент что-нибудь нам напишет
                 //ConsoleHelper.writeSystemMessage(word);
-
                 if (!word.isEmpty()) {
                     String[] packetBlocks = word.split("\\|");
                     //Создаем dto UserPackage
                     String date = DateCalculator.getDate();
-                    UserPackage userPackage = new UserPackage(packetBlocks[0], packetBlocks[1], ExpectedDataType.valueOf(packetBlocks[2]), packetBlocks[3], packetBlocks[4], connection.getIp(), date);
+                    UserPackage userPackage = new UserPackage(packetBlocks[0], packetBlocks[1], ExpectedDataType.valueOf(packetBlocks[2].trim().toUpperCase()), packetBlocks[3], packetBlocks[4], connection.getIp(), date);
                     //ConsoleHelper.writeMessage(connection.getIp() + " " + date);
                     inputQueue.put(userPackage);
                     //Забираем результат проверки покета из очереди

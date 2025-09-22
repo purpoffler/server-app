@@ -1,5 +1,5 @@
 import dto.UserPackage;
-import layer.CheckPacket;
+import layer.ValidationLevel;
 import layer.ProcessingLevel;
 import layer.ServerLevel;
 
@@ -16,7 +16,7 @@ public class Main {
 
         // Создаем потоки и передаем в них очереди, с которыми они должны работать
         Thread inputThread = new Thread(new ServerLevel(inputQueue, resultValidateQueue));
-        Thread checkThread = new Thread(new CheckPacket(inputQueue, resultValidateQueue, processingQueue));
+        Thread checkThread = new Thread(new ValidationLevel(inputQueue, resultValidateQueue, processingQueue));
         Thread processThread = new Thread(new ProcessingLevel(processingQueue));
 
         inputThread.start();

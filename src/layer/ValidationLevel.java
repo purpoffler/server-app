@@ -6,12 +6,12 @@ import utlis.ConsoleHelper;
 import java.util.concurrent.BlockingQueue;
 import java.util.zip.CRC32;
 
-public class CheckPacket implements Runnable {
+public class ValidationLevel implements Runnable {
     private final BlockingQueue<UserPackage> inputQueue;
     private final BlockingQueue<UserPackage> processingQueue;
     private final BlockingQueue<String> resultValidateQueue;
 
-    public CheckPacket(BlockingQueue<UserPackage> inputQueue, BlockingQueue<String> resultValidateQueue, BlockingQueue<UserPackage> processingQueue) {
+    public ValidationLevel(BlockingQueue<UserPackage> inputQueue, BlockingQueue<String> resultValidateQueue, BlockingQueue<UserPackage> processingQueue) {
         this.inputQueue = inputQueue;
         this.processingQueue = processingQueue;
         this.resultValidateQueue = resultValidateQueue;
