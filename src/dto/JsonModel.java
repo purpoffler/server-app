@@ -1,4 +1,4 @@
-package layer.jsonWriter;
+package dto;
 
 public class JsonModel {
     private String date;
