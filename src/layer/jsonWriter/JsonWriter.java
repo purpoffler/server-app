@@ -33,7 +33,7 @@ public class JsonWriter {
         }
 
         jsonModels.add(new JsonModel(date, ip, data));
-        ConsoleHelper.writeMessage(jsonModels.toString());
+        //ConsoleHelper.writeMessage(jsonModels.toString());
         try (FileWriter fw = new FileWriter(file)) {
             gson.toJson(jsonModels, fw);
         }
