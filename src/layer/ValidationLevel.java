@@ -10,6 +10,8 @@ public class ValidationLevel implements Runnable {
     private final BlockingQueue<UserPackage> inputQueue;
     private final BlockingQueue<UserPackage> processingQueue;
     private final BlockingQueue<String> resultValidateQueue;
+    private final String signature = "zWj`Jjkg";
+
 
     public ValidationLevel(BlockingQueue<UserPackage> inputQueue, BlockingQueue<String> resultValidateQueue, BlockingQueue<UserPackage> processingQueue) {
         this.inputQueue = inputQueue;
@@ -19,41 +21,55 @@ public class ValidationLevel implements Runnable {
 
     @Override
     public void run() {
-        try {
-            while (true) { // цикл обработки пакетов
+        while (true) {
+            try {
                 UserPackage userPackage = inputQueue.take();
+                String clientSignature = userPackage.getSignature();
                 String data = userPackage.getData();
                 String clientCRC32 = userPackage.getClientCRC32();
                 //ConsoleHelper.writeSystemMessage(String.valueOf(checkCRC32(data, clientCRC32)));
-                if (checkCRC32(data, clientCRC32)) {
-                    ConsoleHelper.writeMessage("Проверка пакета " + String.valueOf(checkCRC32(data, clientCRC32)));
-                    if (resultValidateQueue.offer("Пакет в норме")) {
+                if (checkSignature(clientSignature)) {
+                    if (checkCRC32(data, clientCRC32)) {
+                        if (!resultValidateQueue.offer("Пакет в норме")) {
+                            ConsoleHelper.writeSystemMessage("Очередь полна, объект не добавился");
+                        }
                         ConsoleHelper.writeSystemMessage("Я положил в очередь положительный ответ проверки пакета");
                         processingQueue.put(userPackage);
                         ConsoleHelper.writeSystemMessage("Положил в processingQueue");
                     } else {
-                        ConsoleHelper.writeSystemMessage("Очередь полна, объект не добавился");
+                        ConsoleHelper.writeSystemMessage("CRC32 не совпадает");
+                        sendNegativeAnswer();
                     }
                 } else {
-                    //ConsoleHelper.writeSystemMessage("Я говорю, что пакет поломался");
-                    if (resultValidateQueue.offer("Пакет поломался")) {
-                        ConsoleHelper.writeSystemMessage("Я положил в очередь отрицательный ответ проверки пакета");
-                    } else {
-                        ConsoleHelper.writeSystemMessage("Очередь полна, объект не добавился");
-                    }
+                    ConsoleHelper.writeSystemMessage("Неправильная сигнатура пакета");
+                    sendNegativeAnswer();
                 }
+            } catch (InterruptedException e) {
+                ConsoleHelper.writeSystemMessage("Ошибка при извлечении данных из inputQueue в CheckPacket");
             }
-        } catch (InterruptedException e) {
-            ConsoleHelper.writeSystemMessage("Ошибка при извлечении данных из inputQueue в CheckPacket");
         }
     }
 
     // Проверка контрольной суммы
-    public boolean checkCRC32(String data, String clientCRC32) {
+    private boolean checkCRC32(String data, String clientCRC32) {
         CRC32 crc32 = new CRC32();
         crc32.update(data.getBytes());
         long value = crc32.getValue();
         String serverCRC32 = String.valueOf(value);
         return serverCRC32.equals(clientCRC32);
+    }
+
+    // Проверка Сигнатуры
+    private boolean checkSignature(String clientSignature) {
+        return signature.equals(clientSignature);
+    }
+
+    // Отправка негативного ответа в очередь resultValidateQueue
+    private void sendNegativeAnswer() {
+        if (resultValidateQueue.offer("Пакет поломался")) {
+            ConsoleHelper.writeSystemMessage("Я положил в очередь отрицательный ответ проверки пакета");
+        } else {
+            ConsoleHelper.writeSystemMessage("Очередь полна, объект не добавился");
+        }
     }
 }

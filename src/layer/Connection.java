@@ -26,7 +26,7 @@ public class Connection implements Closeable {
         return in.readLine();
     }
 
-    public String getIp(){
+    public String getIp() {
         return clientSocket.getInetAddress().getHostAddress();
     }
 
