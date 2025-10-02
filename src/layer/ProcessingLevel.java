@@ -1,10 +1,13 @@
 package layer;
 
 
-import dto.UserPackage;
+import layer.dto.UserPackage;
 import layer.enums.ExpectedDataType;
-import layer.jsonWriter.JsonWriter;
+import utlis.JsonWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import utlis.ConsoleHelper;
+import utlis.ServerConfig;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -13,19 +16,16 @@ import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
 
 public class ProcessingLevel implements Runnable {
-    private final BlockingQueue<UserPackage> processingQueue;
-    private JsonWriter jsonWriter = new JsonWriter();
-
-    public ProcessingLevel(BlockingQueue<UserPackage> processingQueue) {
-        this.processingQueue = processingQueue;
-    }
+    private final BlockingQueue<UserPackage> processingQueue = ServerConfig.getProcessingQueue();
+    private final JsonWriter jsonWriter = new JsonWriter();
+    private static final Logger log = LoggerFactory.getLogger(ProcessingLevel.class);
 
     @Override
     public void run() {
         try {
             while (true) {
                 UserPackage userPackage = processingQueue.take();
-                ConsoleHelper.writeSystemMessage("Получил данные из processingQueue");
+                log.debug("Получил dto из processingQueue");
                 switch (userPackage.getDataType()) {
                     case JSON:
                         jsonWriter.writeJson(userPackage.getDate(), userPackage.getIp(), userPackage.getData());
@@ -37,13 +37,13 @@ public class ProcessingLevel implements Runnable {
                         ConsoleHelper.writeMessage(userPackage.getDate() + " " + userPackage.getIp() + " " + userPackage.getData());
                         break;
                     default:
-                        ConsoleHelper.writeSystemMessage("Тип введенных данных" + userPackage.getDataType() + "а не " + Arrays.toString(ExpectedDataType.values()));
+                        log.warn("Тип введенных данных" + userPackage.getDataType() + "а не " + Arrays.toString(ExpectedDataType.values()));
                 }
             }
         } catch (InterruptedException e) {
-            ConsoleHelper.writeSystemMessage("Ошибка при извлечении данных из processingQueue в классе ProcessingLevel");
+            log.error("Ошибка при извлечении данных из processingQueue в классе ProcessingLevel");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error("Ошибка при создании объекта потока ввода-вывода");
         }
     }
 

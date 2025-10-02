@@ -1,23 +1,20 @@
 package layer;
 
-import dto.UserPackage;
+import layer.dto.UserPackage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import utlis.ConsoleHelper;
+import utlis.ServerConfig;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.zip.CRC32;
 
 public class ValidationLevel implements Runnable {
-    private final BlockingQueue<UserPackage> inputQueue;
-    private final BlockingQueue<UserPackage> processingQueue;
-    private final BlockingQueue<String> resultValidateQueue;
-    private final String signature = "zWj`Jjkg";
-
-
-    public ValidationLevel(BlockingQueue<UserPackage> inputQueue, BlockingQueue<String> resultValidateQueue, BlockingQueue<UserPackage> processingQueue) {
-        this.inputQueue = inputQueue;
-        this.processingQueue = processingQueue;
-        this.resultValidateQueue = resultValidateQueue;
-    }
+    private final BlockingQueue<UserPackage> inputQueue = ServerConfig.getInputQueue();
+    private final BlockingQueue<UserPackage> processingQueue = ServerConfig.getProcessingQueue();
+    private final BlockingQueue<String> resultValidateQueue = ServerConfig.getResultValidateQueue();
+    private final String signature = ServerConfig.getSignature();
+    private static final Logger log = LoggerFactory.getLogger(ValidationLevel.class);
 
     @Override
     public void run() {
@@ -27,25 +24,26 @@ public class ValidationLevel implements Runnable {
                 String clientSignature = userPackage.getSignature();
                 String data = userPackage.getData();
                 String clientCRC32 = userPackage.getClientCRC32();
-                //ConsoleHelper.writeSystemMessage(String.valueOf(checkCRC32(data, clientCRC32)));
+                log.debug("Результат проверки CRC32" + String.valueOf(checkCRC32(data, clientCRC32)));
+                log.debug("Результат проверки сигнатуры" + String.valueOf(checkSignature(clientSignature)));
                 if (checkSignature(clientSignature)) {
                     if (checkCRC32(data, clientCRC32)) {
                         if (!resultValidateQueue.offer("Пакет в норме")) {
-                            ConsoleHelper.writeSystemMessage("Очередь полна, объект не добавился");
+                            log.error("Очередь полна, положительный ответ проверки пакета не добавился");
                         }
-                        ConsoleHelper.writeSystemMessage("Я положил в очередь положительный ответ проверки пакета");
+                        log.debug("Я положил в очередь положительный ответ проверки пакета");
                         processingQueue.put(userPackage);
-                        ConsoleHelper.writeSystemMessage("Положил в processingQueue");
+                        log.debug("Положил dto в processingQueue");
                     } else {
-                        ConsoleHelper.writeSystemMessage("CRC32 не совпадает");
+                        log.debug("CRC32 не совпадает");
                         sendNegativeAnswer();
                     }
                 } else {
-                    ConsoleHelper.writeSystemMessage("Неправильная сигнатура пакета");
+                    log.debug("Неправильная сигнатура пакета");
                     sendNegativeAnswer();
                 }
             } catch (InterruptedException e) {
-                ConsoleHelper.writeSystemMessage("Ошибка при извлечении данных из inputQueue в CheckPacket");
+                log.error("Ошибка при извлечении данных из inputQueue в CheckPacket");
             }
         }
     }
@@ -67,9 +65,9 @@ public class ValidationLevel implements Runnable {
     // Отправка негативного ответа в очередь resultValidateQueue
     private void sendNegativeAnswer() {
         if (resultValidateQueue.offer("Пакет поломался")) {
-            ConsoleHelper.writeSystemMessage("Я положил в очередь отрицательный ответ проверки пакета");
+            log.debug("Я положил в очередь отрицательный ответ проверки пакета");
         } else {
-            ConsoleHelper.writeSystemMessage("Очередь полна, объект не добавился");
+            log.debug("Очередь полна, отрицательный ответ не добавился");
         }
     }
 }

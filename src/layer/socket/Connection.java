@@ -1,4 +1,6 @@
-package layer;
+package layer.socket;
+
+import utlis.ServerConfig;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -11,7 +13,7 @@ public class Connection implements Closeable {
     private final BufferedReader in;
 
     public Connection() throws IOException {
-        serverSocket = new ServerSocket(4004);
+        serverSocket = new ServerSocket(ServerConfig.getPort());
         clientSocket = serverSocket.accept();
         this.out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
         this.in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));

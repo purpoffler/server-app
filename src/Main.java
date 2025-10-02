@@ -1,23 +1,21 @@
-import dto.UserPackage;
 import layer.ValidationLevel;
 import layer.ProcessingLevel;
 import layer.ServerLevel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import utlis.ServerConfig;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 public class Main {
     public static void main(String[] args) {
-        // Очереди для связи между потоками
-        BlockingQueue<UserPackage> inputQueue = new LinkedBlockingQueue<>();
-        BlockingQueue<String> resultValidateQueue = new LinkedBlockingQueue<>();
-        BlockingQueue<UserPackage> processingQueue = new LinkedBlockingQueue<>();
+        ServerConfig serverConfig = ServerConfig.getInstance();
 
+        Logger log = LoggerFactory.getLogger(Main.class);
+        log.info("Программа запустилась");
 
-        // Создаем потоки и передаем в них очереди, с которыми они должны работать
-        Thread inputThread = new Thread(new ServerLevel(inputQueue, resultValidateQueue));
-        Thread checkThread = new Thread(new ValidationLevel(inputQueue, resultValidateQueue, processingQueue));
-        Thread processThread = new Thread(new ProcessingLevel(processingQueue));
+        Thread inputThread = new Thread(new ServerLevel());
+        Thread checkThread = new Thread(new ValidationLevel());
+        Thread processThread = new Thread(new ProcessingLevel());
 
         inputThread.start();
         checkThread.start();

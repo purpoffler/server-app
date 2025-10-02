@@ -1,10 +1,11 @@
-package layer.jsonWriter;
+package utlis;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import dto.JsonModel;
-import utlis.ConsoleHelper;
+import layer.dto.JsonModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileReader;
@@ -19,6 +20,7 @@ public class JsonWriter {
     private volatile File file = new File("UserJson.json");
     private final Type listType = new TypeToken<List<JsonModel>>() {
     }.getType();
+    private static final Logger log = LoggerFactory.getLogger(JsonWriter.class);
 
     public void writeJson(String date, String ip, String data) throws IOException {
         ArrayList<JsonModel> jsonModels = new ArrayList<>();
@@ -33,7 +35,7 @@ public class JsonWriter {
         }
 
         jsonModels.add(new JsonModel(date, ip, data));
-        //ConsoleHelper.writeMessage(jsonModels.toString());
+        log.debug("Записываем в json: " + jsonModels.toString());
         try (FileWriter fw = new FileWriter(file)) {
             gson.toJson(jsonModels, fw);
         }

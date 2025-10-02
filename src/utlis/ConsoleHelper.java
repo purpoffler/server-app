@@ -1,5 +1,9 @@
 package utlis;
 
+import layer.ValidationLevel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -7,6 +11,7 @@ import java.io.InputStreamReader;
 
 public class ConsoleHelper {
     private static BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+    private static final Logger log = LoggerFactory.getLogger(ConsoleHelper.class);
 
     public static void getInstruction() {
         System.out.println();
@@ -25,30 +30,17 @@ public class ConsoleHelper {
     }
 
     public static void writeSystemMessage(String message) {
-        System.out.println("\u001B[34m" + "Системное сообщение:\n" + message + "\u001B[0m" + "\n");
+        System.out.println(ServerConfig.getColorBlue() + "Системное сообщение:\n" + message + ServerConfig.getColorDefault() + "\n");
     }
 
     public static String readString() {
         while (true) {
             try {
-                    String line = bf.readLine();
-                    return line;
+                return bf.readLine();
             } catch (IOException e) {
                 System.out.println(" Произошла ошибка при попытке ввода текста. Попробуйте еще раз.");
+                log.error(" Произошла ошибка при попытке ввода текста. Попробуйте еще раз.");
             }
         }
     }
-
-    public static int readInt() {
-        int digit;
-        while (true) {
-            try {
-                digit = Integer.parseInt(readString());
-                return digit;
-            } catch (NumberFormatException e) {
-                System.out.println("Произошла ошибка при попытке ввода числа. Попробуйте еще раз.");
-            }
-        }
-    }
-
 }

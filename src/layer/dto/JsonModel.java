@@ -1,4 +1,4 @@
-package dto;
+package layer.dto;
 
 public class JsonModel {
     private String date;
