@@ -33,7 +33,7 @@ public class ServerLevel implements Runnable {
 
                         String date = DateCalculator.getDate();
                         UserPackage userPackage = new UserPackage(packetBlocks[0], packetBlocks[1], ExpectedDataType.valueOf(packetBlocks[2].trim().toUpperCase()), packetBlocks[3], packetBlocks[4], connection.getIp(), date);
-
+                        log.debug("Отправляем пакет на валидацию: " + userPackage);
                         inputQueue.put(userPackage);
 
                         String resultValidatePacket = resultValidateQueue.poll(500, TimeUnit.MILLISECONDS);
