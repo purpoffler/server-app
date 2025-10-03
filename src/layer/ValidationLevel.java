@@ -29,7 +29,7 @@ public class ValidationLevel implements Runnable {
                 if (checkSignature(clientSignature)) {
                     if (checkCRC32(data, clientCRC32)) {
                         if (!resultValidateQueue.offer("Пакет в норме")) {
-                            log.error("Очередь полна, положительный ответ проверки пакета не добавился");
+                            log.warn("Очередь полна, положительный ответ проверки пакета не добавился [{}]", this.getClass());
                         }
                         log.debug("Я положил в очередь положительный ответ проверки пакета");
                         processingQueue.put(userPackage);
@@ -43,7 +43,7 @@ public class ValidationLevel implements Runnable {
                     sendNegativeAnswer();
                 }
             } catch (InterruptedException e) {
-                log.error("Ошибка при извлечении данных из inputQueue в CheckPacket");
+                log.error("Ошибка при извлечении данных из inputQueue [{}]", this.getClass(), e);
             }
         }
     }

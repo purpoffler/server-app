@@ -1,29 +1,29 @@
-package utlis;
+package layer.writters;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import layer.dto.JsonModel;
+import layer.dto.UserPackage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utlis.ServerConfig;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JsonWriter {
+public class JsonWritter extends Writter {
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    private volatile File file = new File("UserJson.json");
+    private final String jsonFileName = ServerConfig.getJsonFileName();
     private final Type listType = new TypeToken<List<JsonModel>>() {
     }.getType();
-    private static final Logger log = LoggerFactory.getLogger(JsonWriter.class);
 
-    public void writeJson(String date, String ip, String data) throws IOException {
+    @Override
+    public void doWrite(UserPackage userPackage) throws IOException {
         ArrayList<JsonModel> jsonModels = new ArrayList<>();
+        File file = getFile(jsonFileName);
 
         if (file.exists()) {
             try (FileReader fr = new FileReader(file)) {
@@ -34,7 +34,7 @@ public class JsonWriter {
             }
         }
 
-        jsonModels.add(new JsonModel(date, ip, data));
+        jsonModels.add(new JsonModel(userPackage.getDate(), userPackage.getIp(), userPackage.getData()));
         log.debug("Записываем в json: " + jsonModels.toString());
         try (FileWriter fw = new FileWriter(file)) {
             gson.toJson(jsonModels, fw);

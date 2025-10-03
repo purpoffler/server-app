@@ -48,7 +48,7 @@ public class ServerLevel implements Runnable {
                     }
                 }
             } catch (InterruptedException e) {
-                log.error("Ошибка в считывании пакета");
+                log.error("Ошибка в считывании пакета[{}]", this.getClass(), e);
             } catch (ClassNotFoundException e) {
                 log.warn("Клиент ничего не написал. Ошибка в ServerLevel в методе .receive()");
             } catch (IOException e) {

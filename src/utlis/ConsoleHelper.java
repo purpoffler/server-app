@@ -39,7 +39,7 @@ public class ConsoleHelper {
                 return bf.readLine();
             } catch (IOException e) {
                 System.out.println(" Произошла ошибка при попытке ввода текста. Попробуйте еще раз.");
-                log.error(" Произошла ошибка при попытке ввода текста. Попробуйте еще раз.");
+                log.error(" Произошла ошибка при попытке ввода текста. Попробуйте еще раз. [{}]", ConsoleHelper.class, e);
             }
         }
     }
