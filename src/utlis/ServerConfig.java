@@ -14,14 +14,16 @@ public final class ServerConfig {
     private static final BlockingQueue<UserPackage> inputQueue = new LinkedBlockingQueue<>();
     private static final BlockingQueue<String> resultValidateQueue = new LinkedBlockingQueue<>();
     private static final BlockingQueue<UserPackage> processingQueue = new LinkedBlockingQueue<>();
-    private static Properties properties = new Properties();
-    private static String filePath = "src/config/system.properties";
-    private static String host;
-    private static int port;
-    private static String colorBlue;
-    private static String colorRed;
-    private static String colorGreen;
-    private static String colorDefault;
+    private static final String jsonFileName;
+    private static final String plainFileName;
+    private static final Properties properties = new Properties();
+    private static final String filePath = "src/config/system.properties";
+    private static final String host;
+    private static final int port;
+    private static final String colorBlue;
+    private static final String colorRed;
+    private static final String colorGreen;
+    private static final String colorDefault;
 
     static {
         try {
@@ -33,6 +35,8 @@ public final class ServerConfig {
             colorRed = properties.getProperty("colorRed");
             colorGreen = properties.getProperty("colorGreen");
             colorDefault = properties.getProperty("colorDefault");
+            jsonFileName = properties.getProperty("jsonFileName");
+            plainFileName = properties.getProperty("plainFileName");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -48,7 +52,7 @@ public final class ServerConfig {
         return instance;
     }
 
-    public static String getSignature(){
+    public static String getSignature() {
         return signature;
     }
 
@@ -86,5 +90,13 @@ public final class ServerConfig {
 
     public static String getColorGreen() {
         return colorGreen;
+    }
+
+    public static String getPlainFileName() {
+        return plainFileName;
+    }
+
+    public static String getJsonFileName() {
+        return jsonFileName;
     }
 }
