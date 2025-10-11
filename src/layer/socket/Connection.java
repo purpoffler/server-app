@@ -7,14 +7,14 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Connection implements Closeable {
-    private final Socket clientSocket; //сокет для общения
-    private final ServerSocket serverSocket;
+    private static final ServerConfig serverConfig = ServerConfig.getInstance();
+    private final Socket clientSocket;
     private final BufferedWriter out;
     private final BufferedReader in;
 
     public Connection() throws IOException {
-        serverSocket = new ServerSocket(ServerConfig.getPort());
-        clientSocket = serverSocket.accept();
+        ServerSocket serverSocket = new ServerSocket(serverConfig.getPort());
+        this.clientSocket = serverSocket.accept();
         this.out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
         this.in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
     }

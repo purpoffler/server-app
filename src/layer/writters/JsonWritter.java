@@ -15,8 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JsonWritter extends Writter {
+    private static final ServerConfig serverConfig = ServerConfig.getInstance();
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    private final String jsonFileName = ServerConfig.getJsonFileName();
+    private final String jsonFileName = serverConfig.getJsonFileName();
     private final Type listType = new TypeToken<List<JsonModel>>() {
     }.getType();
 

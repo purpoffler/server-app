@@ -9,7 +9,8 @@ import java.io.IOException;
 
 
 public class PlainWritter extends Writter {
-    private final String plainFileName = ServerConfig.getPlainFileName();
+    private static final ServerConfig serverConfig = ServerConfig.getInstance();
+    private final String plainFileName = serverConfig.getPlainFileName();
 
     public void doWrite(UserPackage userPackage) throws IOException {
         File file = getFile(plainFileName);

@@ -7,8 +7,9 @@ import utlis.ServerConfig;
 
 
 public class Main {
+
     public static void main(String[] args) {
-        ServerConfig serverConfig = ServerConfig.getInstance();
+        ServerConfig.init();
 
         Logger log = LoggerFactory.getLogger(Main.class);
         log.info("Программа запустилась");

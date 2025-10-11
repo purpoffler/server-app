@@ -10,10 +10,11 @@ import java.util.concurrent.BlockingQueue;
 import java.util.zip.CRC32;
 
 public class ValidationLevel implements Runnable {
-    private final BlockingQueue<UserPackage> inputQueue = ServerConfig.getInputQueue();
-    private final BlockingQueue<UserPackage> processingQueue = ServerConfig.getProcessingQueue();
-    private final BlockingQueue<String> resultValidateQueue = ServerConfig.getResultValidateQueue();
-    private final String signature = ServerConfig.getSignature();
+    private final ServerConfig serverConfig = ServerConfig.getInstance();
+    private final BlockingQueue<UserPackage> inputQueue = serverConfig.getInputQueue();
+    private final BlockingQueue<UserPackage> processingQueue = serverConfig.getProcessingQueue();
+    private final BlockingQueue<String> resultValidateQueue = serverConfig.getResultValidateQueue();
+    private final String signature = serverConfig.getSignature();
     private static final Logger log = LoggerFactory.getLogger(ValidationLevel.class);
 
     @Override

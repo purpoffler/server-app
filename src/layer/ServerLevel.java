@@ -13,9 +13,11 @@ import java.io.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+
 public class ServerLevel implements Runnable {
-    private final BlockingQueue<UserPackage> inputQueue = ServerConfig.getInputQueue();
-    private final BlockingQueue<String> resultValidateQueue = ServerConfig.getResultValidateQueue();
+    private static final ServerConfig serverConfig = ServerConfig.getInstance();
+    private final BlockingQueue<UserPackage> inputQueue = serverConfig.getInputQueue();
+    private final BlockingQueue<String> resultValidateQueue = serverConfig.getResultValidateQueue();
     private boolean isClientDisconnected = false;
     private static final Logger log = LoggerFactory.getLogger(ServerLevel.class);
 
@@ -39,7 +41,7 @@ public class ServerLevel implements Runnable {
                         String resultValidatePacket = resultValidateQueue.poll(500, TimeUnit.MILLISECONDS);
                         log.debug("То что забралось из очереди " + resultValidatePacket);
                         if (resultValidatePacket != null) {
-                            connection.send("Привет, это Сервер! Подтверждаю, вы написали : " + word + " " + ServerConfig.getColorGreen() + resultValidatePacket + ServerConfig.getColorDefault() + "\n");
+                            connection.send("Привет, это Сервер! Подтверждаю, вы написали : " + word + " " + serverConfig.getColorGreen() + resultValidatePacket + serverConfig.getColorDefault() + "\n");
                             log.debug("Отправляем клиенту пакет: " + word + " Результат проверки пакета: " + resultValidatePacket);
                         }
                     } else {
@@ -54,7 +56,7 @@ public class ServerLevel implements Runnable {
             } catch (IOException e) {
                 if (!isClientDisconnected) {
                     ConsoleHelper.writeSystemMessage("Клиент отключился, жду нового клиента...");
-                    log.info("Клиент отключился, жду нового клиента...");
+                    log.warn("Клиент отключился, жду нового клиента...");
                     isClientDisconnected = true;
                 }
             }

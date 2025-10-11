@@ -14,7 +14,8 @@ import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
 
 public class ProcessingLevel implements Runnable {
-    private final BlockingQueue<UserPackage> processingQueue = ServerConfig.getProcessingQueue();
+    private static final ServerConfig serverConfig = ServerConfig.getInstance();
+    private final BlockingQueue<UserPackage> processingQueue = serverConfig.getProcessingQueue();
     private final JsonWritter jsonWriter = new JsonWritter();
     private final PlainWritter plainWritter = new PlainWritter();
     private static final Logger log = LoggerFactory.getLogger(ProcessingLevel.class);
