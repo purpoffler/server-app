@@ -30,7 +30,7 @@ public class ServerLevel implements Runnable {
                     String word = connection.receive(); // ждём пока клиент что-нибудь нам напишет
                     isClientDisconnected = false;
                     log.debug("Сообщение от клиента:" + word);
-                    if (!word.isEmpty()) {
+                    if (!(word == null)) {
                         String[] packetBlocks = word.split("\\|");
 
                         String date = DateCalculator.getDate();
