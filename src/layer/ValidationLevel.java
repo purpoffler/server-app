@@ -1,10 +1,8 @@
 package layer;
 
 import layer.dto.UserPackage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import utlis.ConsoleHelper;
-import utlis.ServerConfig;
+import layer.logger.CustomLogger;
+import config.ServerConfig;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.zip.CRC32;
@@ -15,22 +13,22 @@ public class ValidationLevel implements Runnable {
     private final BlockingQueue<UserPackage> processingQueue = serverConfig.getProcessingQueue();
     private final BlockingQueue<String> resultValidateQueue = serverConfig.getResultValidateQueue();
     private final String signature = serverConfig.getSignature();
-    private static final Logger log = LoggerFactory.getLogger(ValidationLevel.class);
+    private static final CustomLogger log = new CustomLogger(ValidationLevel.class.getSimpleName());
 
     @Override
     public void run() {
         while (true) {
             try {
                 UserPackage userPackage = inputQueue.take();
-                String clientSignature = userPackage.getSignature();
-                String data = userPackage.getData();
-                String clientCRC32 = userPackage.getClientCRC32();
+                String clientSignature = userPackage.signature();
+                String data = userPackage.data();
+                String clientCRC32 = userPackage.clientCRC32();
                 log.debug("Результат проверки CRC32" + String.valueOf(checkCRC32(data, clientCRC32)));
                 log.debug("Результат проверки сигнатуры" + String.valueOf(checkSignature(clientSignature)));
                 if (checkSignature(clientSignature)) {
                     if (checkCRC32(data, clientCRC32)) {
                         if (!resultValidateQueue.offer("Пакет в норме")) {
-                            log.warn("Очередь полна, положительный ответ проверки пакета не добавился [{}]", this.getClass());
+                            log.debug("Очередь полна, положительный ответ проверки пакета не добавился");
                         }
                         log.debug("Я положил в очередь положительный ответ проверки пакета");
                         processingQueue.put(userPackage);
@@ -44,7 +42,7 @@ public class ValidationLevel implements Runnable {
                     sendNegativeAnswer();
                 }
             } catch (InterruptedException e) {
-                log.error("Ошибка при извлечении данных из inputQueue [{}]", this.getClass(), e);
+                log.error("Ошибка при извлечении данных из inputQueue", e);
             }
         }
     }

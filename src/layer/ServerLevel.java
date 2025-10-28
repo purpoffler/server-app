@@ -2,12 +2,11 @@ package layer;
 
 import layer.dto.UserPackage;
 import layer.enums.ExpectedDataType;
+import layer.logger.CustomLogger;
 import layer.socket.Connection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import utlis.ConsoleHelper;
 import utlis.DateCalculator;
-import utlis.ServerConfig;
+import config.ServerConfig;
 
 import java.io.*;
 import java.util.concurrent.BlockingQueue;
@@ -15,11 +14,11 @@ import java.util.concurrent.TimeUnit;
 
 
 public class ServerLevel implements Runnable {
-    private static final ServerConfig serverConfig = ServerConfig.getInstance();
+    private final ServerConfig serverConfig = ServerConfig.getInstance();
     private final BlockingQueue<UserPackage> inputQueue = serverConfig.getInputQueue();
     private final BlockingQueue<String> resultValidateQueue = serverConfig.getResultValidateQueue();
     private boolean isClientDisconnected = false;
-    private static final Logger log = LoggerFactory.getLogger(ServerLevel.class);
+    private static final CustomLogger log = new CustomLogger(ServerLevel.class.getSimpleName());
 
     public void run() {
         while (true) {
@@ -27,7 +26,7 @@ public class ServerLevel implements Runnable {
                 ConsoleHelper.writeSystemMessage("Клиент подключился");
                 log.debug("Клиент подключился");
                 while (true) {
-                    String word = connection.receive(); // ждём пока клиент что-нибудь нам напишет
+                    String word = connection.receive();
                     isClientDisconnected = false;
                     log.debug("Сообщение от клиента:" + word);
                     if (!(word == null)) {
@@ -50,13 +49,11 @@ public class ServerLevel implements Runnable {
                     }
                 }
             } catch (InterruptedException e) {
-                log.error("Ошибка в считывании пакета[{}]", this.getClass(), e);
-            } catch (ClassNotFoundException e) {
-                log.warn("Клиент ничего не написал. Ошибка в ServerLevel в методе .receive()");
+                log.error("Ошибка в считывании пакета", e);
             } catch (IOException e) {
                 if (!isClientDisconnected) {
                     ConsoleHelper.writeSystemMessage("Клиент отключился, жду нового клиента...");
-                    log.warn("Клиент отключился, жду нового клиента...");
+                    log.debug("Клиент отключился, жду нового клиента...");
                     isClientDisconnected = true;
                 }
             }

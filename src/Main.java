@@ -1,17 +1,16 @@
 import layer.ValidationLevel;
 import layer.ProcessingLevel;
 import layer.ServerLevel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import utlis.ServerConfig;
+import config.ServerConfig;
+import layer.logger.CustomLogger;
 
 
 public class Main {
-
     public static void main(String[] args) {
-        ServerConfig.init();
+        ServerConfig.getInstance();
 
-        Logger log = LoggerFactory.getLogger(Main.class);
+        CustomLogger log = new CustomLogger(Main.class.getSimpleName());
+
         log.info("Программа запустилась");
 
         Thread inputThread = new Thread(new ServerLevel());

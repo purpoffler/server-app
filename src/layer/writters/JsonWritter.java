@@ -5,9 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import layer.dto.JsonModel;
 import layer.dto.UserPackage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import utlis.ServerConfig;
+import config.ServerConfig;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -15,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JsonWritter extends Writter {
-    private static final ServerConfig serverConfig = ServerConfig.getInstance();
+    private final ServerConfig serverConfig = ServerConfig.getInstance();
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private final String jsonFileName = serverConfig.getJsonFileName();
     private final Type listType = new TypeToken<List<JsonModel>>() {
@@ -35,7 +33,7 @@ public class JsonWritter extends Writter {
             }
         }
 
-        jsonModels.add(new JsonModel(userPackage.getDate(), userPackage.getIp(), userPackage.getData()));
+        jsonModels.add(new JsonModel(userPackage.date(), userPackage.ip(), userPackage.data()));
         log.debug("Записываем в json: " + jsonModels.toString());
         try (FileWriter fw = new FileWriter(file)) {
             gson.toJson(jsonModels, fw);
