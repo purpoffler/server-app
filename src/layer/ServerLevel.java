@@ -32,12 +32,18 @@ public class ServerLevel implements Runnable {
                     if (!(word == null)) {
                         String[] packetBlocks = word.split("\\|");
 
-                        String date = DateCalculator.getDate();
-                        UserPackage userPackage = new UserPackage(packetBlocks[0], packetBlocks[1], ExpectedDataType.valueOf(packetBlocks[2].trim().toUpperCase()), packetBlocks[3], packetBlocks[4], connection.getIp(), date);
+                        UserPackage userPackage = new UserPackage(
+                                packetBlocks[0],
+                                packetBlocks[1],
+                                ExpectedDataType.valueOf(packetBlocks[2].trim().toUpperCase()),
+                                packetBlocks[3],
+                                packetBlocks[4],
+                                connection.getIp(),
+                                DateCalculator.getDate());
                         log.debug("Отправляем пакет на валидацию: " + userPackage);
                         inputQueue.put(userPackage);
 
-                        String resultValidatePacket = resultValidateQueue.poll(500, TimeUnit.MILLISECONDS);
+                        String resultValidatePacket = resultValidateQueue.poll();
                         log.debug("То что забралось из очереди " + resultValidatePacket);
                         if (resultValidatePacket != null) {
                             connection.send("Привет, это Сервер! Подтверждаю, вы написали : " + word + " " + serverConfig.getColorGreen() + resultValidatePacket + serverConfig.getColorDefault() + "\n");

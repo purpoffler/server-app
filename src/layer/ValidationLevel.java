@@ -12,7 +12,6 @@ public class ValidationLevel implements Runnable {
     private final BlockingQueue<UserPackage> inputQueue = serverConfig.getInputQueue();
     private final BlockingQueue<UserPackage> processingQueue = serverConfig.getProcessingQueue();
     private final BlockingQueue<String> resultValidateQueue = serverConfig.getResultValidateQueue();
-    private final String signature = serverConfig.getSignature();
     private static final CustomLogger log = new CustomLogger(ValidationLevel.class.getSimpleName());
 
     @Override
@@ -23,8 +22,8 @@ public class ValidationLevel implements Runnable {
                 String clientSignature = userPackage.signature();
                 String data = userPackage.data();
                 String clientCRC32 = userPackage.clientCRC32();
-                log.debug("Результат проверки CRC32" + String.valueOf(checkCRC32(data, clientCRC32)));
-                log.debug("Результат проверки сигнатуры" + String.valueOf(checkSignature(clientSignature)));
+                log.debug("Результат проверки CRC32" + checkCRC32(data, clientCRC32));
+                log.debug("Результат проверки сигнатуры" + checkSignature(clientSignature));
                 if (checkSignature(clientSignature)) {
                     if (checkCRC32(data, clientCRC32)) {
                         if (!resultValidateQueue.offer("Пакет в норме")) {
@@ -58,7 +57,7 @@ public class ValidationLevel implements Runnable {
 
     // Проверка Сигнатуры
     private boolean checkSignature(String clientSignature) {
-        return signature.equals(clientSignature);
+        return serverConfig.getSignature().equals(clientSignature);
     }
 
     // Отправка негативного ответа в очередь resultValidateQueue
