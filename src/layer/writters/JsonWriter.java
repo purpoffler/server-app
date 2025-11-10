@@ -12,17 +12,16 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JsonWritter extends Writter {
+public class JsonWriter extends Writer {
     private final ServerConfig serverConfig = ServerConfig.getInstance();
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    private final String jsonFileName = serverConfig.getJsonFileName();
     private final Type listType = new TypeToken<List<JsonModel>>() {
     }.getType();
 
     @Override
     public void doWrite(UserPackage userPackage) throws IOException {
         ArrayList<JsonModel> jsonModels = new ArrayList<>();
-        File file = getFile(jsonFileName);
+        File file = getFile(serverConfig.getJsonFileName());
 
         if (file.exists()) {
             try (FileReader fr = new FileReader(file)) {

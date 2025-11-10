@@ -12,10 +12,11 @@ public class Connection implements Closeable {
     private final BufferedReader in;
 
     public Connection() throws IOException {
-        ServerSocket serverSocket = new ServerSocket(ServerConfig.getInstance().getPort());
-        this.clientSocket = serverSocket.accept();
-        this.out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
-        this.in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        try (ServerSocket serverSocket = new ServerSocket(ServerConfig.getInstance().getPort())) {
+            this.clientSocket = serverSocket.accept();
+            this.out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+            this.in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        }
     }
 
     public void send(String string) throws IOException {

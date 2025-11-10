@@ -1,22 +1,15 @@
 package layer;
 
-import layer.dto.UserPackage;
-import layer.enums.ExpectedDataType;
+import config.ServerConfig;
 import layer.logger.CustomLogger;
 import layer.socket.Connection;
 import utlis.ConsoleHelper;
-import utlis.DateCalculator;
-import config.ServerConfig;
 
-import java.io.*;
-import java.util.concurrent.BlockingQueue;
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
-
 
 public class ServerLevel implements Runnable {
     private final ServerConfig serverConfig = ServerConfig.getInstance();
-    private final BlockingQueue<UserPackage> inputQueue = serverConfig.getInputQueue();
-    private final BlockingQueue<String> resultValidateQueue = serverConfig.getResultValidateQueue();
     private boolean isClientDisconnected = false;
     private static final CustomLogger log = new CustomLogger(ServerLevel.class.getSimpleName());
 
@@ -29,24 +22,16 @@ public class ServerLevel implements Runnable {
                     String word = connection.receive();
                     isClientDisconnected = false;
                     log.debug("Сообщение от клиента:" + word);
-                    if (!(word == null)) {
-                        String[] packetBlocks = word.split("\\|");
-
-                        UserPackage userPackage = new UserPackage(
-                                packetBlocks[0],
-                                packetBlocks[1],
-                                ExpectedDataType.valueOf(packetBlocks[2].trim().toUpperCase()),
-                                packetBlocks[3],
-                                packetBlocks[4],
-                                connection.getIp(),
-                                DateCalculator.getDate());
-                        log.debug("Отправляем пакет на валидацию: " + userPackage);
-                        inputQueue.put(userPackage);
-
-                        String resultValidatePacket = resultValidateQueue.poll();
+                    if (word != null) {
+                        serverConfig.getInputQueue().put(word + "|" + connection.getIp());
+                        log.debug("Отправляем на валидацию: " + word);
+                        String resultValidatePacket = serverConfig.getResultValidateQueue().poll(500, TimeUnit.MILLISECONDS);
                         log.debug("То что забралось из очереди " + resultValidatePacket);
                         if (resultValidatePacket != null) {
-                            connection.send("Привет, это Сервер! Подтверждаю, вы написали : " + word + " " + serverConfig.getColorGreen() + resultValidatePacket + serverConfig.getColorDefault() + "\n");
+                            String response = String.format("Привет, это Сервер! Подтверждаю, вы написали : %s %s",
+                                    word,
+                                    serverConfig.getColorGreen() + resultValidatePacket + serverConfig.getColorDefault());
+                            connection.send(response + "\n");
                             log.debug("Отправляем клиенту пакет: " + word + " Результат проверки пакета: " + resultValidatePacket);
                         }
                     } else {

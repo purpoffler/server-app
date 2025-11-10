@@ -8,7 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 
-public class PlainWritter extends Writter {
+public class PlainWriter extends Writer {
     private final ServerConfig serverConfig = ServerConfig.getInstance();
     private final String plainFileName = serverConfig.getPlainFileName();
 

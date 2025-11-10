@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public abstract class Writter {
+public abstract class Writer {
     protected final CustomLogger log = new CustomLogger(getClass().getSimpleName());
 
     public void write(UserPackage userPackage) {

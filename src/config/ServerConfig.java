@@ -10,12 +10,11 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class ServerConfig {
-    private volatile static ServerConfig instance;
-    private final BlockingQueue<UserPackage> inputQueue = new LinkedBlockingQueue<>();
+    private static ServerConfig instance;
+    private final BlockingQueue<String> inputQueue = new LinkedBlockingQueue<>();
     private final BlockingQueue<String> resultValidateQueue = new LinkedBlockingQueue<>();
     private final BlockingQueue<UserPackage> processingQueue = new LinkedBlockingQueue<>();
-    private final static String SIGNATURE = "zWj`Jjkg";
-    private final static String CONFIG_FILE_PATH = "src/config/system.properties";
+    private final static String CONFIG_FILE_PATH = "src/config/application.properties";
 
     private String jsonFileName;
     private String plainFileName;
@@ -24,6 +23,7 @@ public class ServerConfig {
     private String colorGreen;
     private String colorDefault;
     private String logFilePath;
+    private String signature;
 
     private ServerConfig() {
         try {
@@ -36,6 +36,7 @@ public class ServerConfig {
             this.jsonFileName = properties.getProperty("jsonFileName", "UserJson.json");
             this.plainFileName = properties.getProperty("plainFileName", "UserText.txt");
             this.logFilePath = properties.getProperty("logFilePath", "logFilePath=logs/custom.log");
+            this.signature = "zWj`Jjkg";
         } catch (IOException e) {
             ConsoleHelper.writeMessage("Файл c property не найден");
         }
@@ -43,20 +44,16 @@ public class ServerConfig {
 
     public static ServerConfig getInstance() {
         if (instance == null) {
-            synchronized (ServerConfig.class) {
-                if (instance == null) {
-                    instance = new ServerConfig();
-                }
-            }
+            instance = new ServerConfig();
         }
         return instance;
     }
 
     public String getSignature() {
-        return SIGNATURE;
+        return signature;
     }
 
-    public BlockingQueue<UserPackage> getInputQueue() {
+    public BlockingQueue<String> getInputQueue() {
         return inputQueue;
     }
 
