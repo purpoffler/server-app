@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JsonWriter extends Writer {
-    private final ServerConfig serverConfig = ServerConfig.getInstance();
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private final Type listType = new TypeToken<List<JsonModel>>() {
     }.getType();
@@ -21,7 +20,7 @@ public class JsonWriter extends Writer {
     @Override
     public void doWrite(UserPackage userPackage) throws IOException {
         ArrayList<JsonModel> jsonModels = new ArrayList<>();
-        File file = getFile(serverConfig.getJsonFileName());
+        File file = getFile(ServerConfig.getInstance().getJsonFileName());
 
         if (file.exists()) {
             try (FileReader fr = new FileReader(file)) {
@@ -33,7 +32,7 @@ public class JsonWriter extends Writer {
         }
 
         jsonModels.add(new JsonModel(userPackage.date(), userPackage.ip(), userPackage.data()));
-        log.debug("Записываем в json: " + jsonModels.toString());
+        log.debug("Записываем в json: " + jsonModels);
         try (FileWriter fw = new FileWriter(file)) {
             gson.toJson(jsonModels, fw);
         }

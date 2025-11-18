@@ -10,7 +10,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class ServerConfig {
-    private static ServerConfig instance;
+    private static ServerConfig INSTANCE;
     private final BlockingQueue<String> inputQueue = new LinkedBlockingQueue<>();
     private final BlockingQueue<String> resultValidateQueue = new LinkedBlockingQueue<>();
     private final BlockingQueue<UserPackage> processingQueue = new LinkedBlockingQueue<>();
@@ -43,10 +43,10 @@ public class ServerConfig {
     }
 
     public static ServerConfig getInstance() {
-        if (instance == null) {
-            instance = new ServerConfig();
+        if (INSTANCE == null) {
+            INSTANCE = new ServerConfig();
         }
-        return instance;
+        return INSTANCE;
     }
 
     public String getSignature() {
